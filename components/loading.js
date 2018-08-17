@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, ActivityIndicator } from "react-native";
 
 const Loading = () => {
   return (
@@ -13,11 +13,7 @@ const Loading = () => {
           marginTop: "-30%"
         }}
       />
-      <Text style={styles.text}>Loading ...</Text>
-      <Text style={styles.text2}>
-        The server is hosting by free Heroku Plan
-      </Text>
-      <Text style={styles.text2}>So Be Patient Thanks</Text>
+      <ActivityIndicator size="large" color="#E8B959" />
     </View>
   );
 };
@@ -30,13 +26,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgb(55, 57, 61)"
-  },
-  text: {
-    color: "#E8B959",
-    fontSize: 40
-  },
-  text2: {
-    color: "#E8B959",
-    fontSize: 20
   }
 });

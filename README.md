@@ -2,9 +2,8 @@
 
 <img src="https://syntax.fm/static/logo.png" width="400">
 
-This my first React Native project. You can find the release soon in the Google Play Store 
+This my first React Native project. You can find the release in the Google Play Store 
 <img src="https://fr.seaicons.com/wp-content/uploads/2015/10/Google-Play-Store-alt-icon.png" width="20">
- and F-Droid <img src="https://f-droid.org/assets/fdroid-logo.svg" width="20">
 
 
 Android version Only 🤖
