@@ -71,17 +71,19 @@ export default class Pod extends Component {
                     }
                   >
                     <View style={styles.border}>
-                      <View style={{ flex: 2, marginLeft: 5, marginRight: 5 }}>
-                        <Text
-                          style={styles.textLeft}
-                        >
-                          {dateFns.format(JSON.parse(item.date), "DD/MM/YY")}
+                      <View
+                        style={{
+                          flex: 2,
+                          marginLeft: 5,
+                          marginRight: 5
+                        }}
+                      >
+                        <Text style={styles.textLeft}>
+                          {dateFns.format(JSON.parse(item.date), "DD/MM")}
                         </Text>
                       </View>
                       <View style={{ flex: 8 }}>
-                        <Text
-                          style={styles.textCenter}
-                        >
+                        <Text style={styles.textCenter}>
                           Episode {item.id}: {item.name}
                         </Text>
                       </View>
@@ -107,27 +109,38 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: "rgb(55, 57, 61)",
-    paddingTop: 20
+    paddingTop: 20,
+    paddingRight: 10,
+    paddingLeft: 10
   },
   border: {
-    backgroundColor: "rgba(45, 45, 45, 0.2)",
-    borderRadius: 4,
+    backgroundColor: "rgb(234, 234, 234)",
+    borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#E8B959",
+    borderColor: "#eaeaea",
     padding: 8,
+    minHeight: 50,
     margin: 5,
     display: "flex",
     flexDirection: "row",
     alignItems: "center"
   },
   textLeft: {
-    fontSize: 12,
-    color: "pink",
+    fontSize: 18,
+    color: "black",
+    marginRight: 10,
     fontWeight: "bold",
-    marginRight: 10
-  },textCenter: {
-    fontSize: 15,
-    color: "#E8B959",
-    textAlign: "center"
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 10,
+    textShadowColor: "#E8B959"
+  },
+  textCenter: {
+    fontSize: 18,
+    color: "rgb(55, 57, 61)",
+    textAlign: "center",
+    fontWeight: "bold",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 10,
+    textShadowColor: "#E8B959"
   }
 });
