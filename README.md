@@ -2,35 +2,31 @@
 
 <img src="https://syntax.fm/static/logo.png" width="400">
 
-This my first React Native project. You can find the release in the Google Play Store 
+First React Native project. You can find the release in the Google Play Store
 <img src="https://fr.seaicons.com/wp-content/uploads/2015/10/Google-Play-Store-alt-icon.png" width="20">
-
 
 Android version Only 🤖
 
-
 ## Modules
 
-* React Native 0.56
-* Appolo - GraphQL
-* React Native Sound
-* React Navigation
-* React Native Simple Markdown
-* React Native Swipper
-* React Native FS
-* React Native Progress
-* React Native Fetch Blob
+- React Native 0.56
+- Appolo - GraphQL
+- React Native Sound
+- React Navigation
+- React Native Simple Markdown
+- React Native Swipper
+- React Native FS
+- React Native Progress
 
 ## Developement
 
 Clone this repo
 
-Then  `yarn install`  and  `react-native link`
+Then `yarn install` and `react-native link`
 
-Finally `react-native run-android` 
+Finally `react-native run-android`
 
-Else you can read the doc:  [ReactNative Docs](https://facebook.github.io/react-native/docs/getting-started)
-
+Else you can read the doc: [ReactNative Docs](https://facebook.github.io/react-native/docs/getting-started)
 
 ## Work with custom API
 

@@ -3,13 +3,13 @@ import {
   View,
   Text,
   Slider,
-  TouchableOpacity,
   Image,
   StyleSheet,
   Animated,
-  Easing
+  Easing,
+  AsyncStorage
 } from "react-native";
-import { AsyncStorage } from "react-native";
+
 import Sound from "react-native-sound";
 //
 import PlayButton from "./playButton";
@@ -82,7 +82,7 @@ class Player extends Component {
       this.setState({ playState: "playing" });
     } else {
       this.sound = new Sound(
-        "/storage/emulated/0/Music/Syntax/" + `Syntax${filepath}.mp3`,
+        this.props.dir + `/Syntax${filepath}.mp3`,
         null,
         error => {
           if (error) {
@@ -211,13 +211,9 @@ class Player extends Component {
               />
               <ForwardButton forward={this.forward} />
             </View>
-            <View
-              style={styles.bigPlay}
-            >
+            <View style={styles.bigPlay}>
               {this.state.playState === "playing" ? (
-                <View
-                  style={styles.play}
-                >
+                <View style={styles.play}>
                   <PlayButton
                     playSpeed={this.playSpeed}
                     speed={this.state.speed}
@@ -257,14 +253,14 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
     textShadowColor: "#E8B959"
   },
-  play:{
+  play: {
     justifyContent: "center",
     display: "flex",
     alignItems: "center",
     flexDirection: "row",
     marginTop: 20
   },
-  bigPlay:{
+  bigPlay: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",

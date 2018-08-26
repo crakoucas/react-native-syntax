@@ -8,7 +8,8 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 
 const client = new ApolloClient({
-  uri: "https://frozen-journey-67030.herokuapp.com/graphql"
+  //uri: "https://frozen-journey-67030.herokuapp.com/graphql"
+  uri: "https://syntax.crakoucas.ovh/graphql"
 });
 
 const App = () => (

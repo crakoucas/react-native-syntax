@@ -3,19 +3,16 @@ import {
   StyleSheet,
   View,
   Text,
-  ScrollView,
   Image,
   TouchableOpacity,
-  Animated
+  Animated,
+  AsyncStorage
 } from "react-native";
 import * as Progress from "react-native-progress";
-import { AsyncStorage } from "react-native";
 
 import gql from "graphql-tag";
 import { Query } from "react-apollo";
-import RNFetchBlob from "rn-fetch-blob";
 import Swiper from "react-native-swiper";
-import { PermissionsAndroid } from "react-native";
 
 import RNFS from "react-native-fs";
 
@@ -23,7 +20,7 @@ import Player from "../player/player";
 import Loading from "../loading";
 import ErrorComponent from "../error";
 import ViewDelete from "./view/viewDelete";
-import  ViewDeleteDisable from "./view/viewDeleteDisable"
+import ViewDeleteDisable from "./view/viewDeleteDisable";
 import ViewMarkdown from "./view/viewMarkdown";
 import ViewTitle from "./view/viewTitle";
 
@@ -39,8 +36,6 @@ const GET_PODCAST = gql`
   }
 `;
 
-let dirs = RNFetchBlob.fs.dirs;
-
 export default class Podcast extends Component {
   state = {
     download: false,
@@ -51,25 +46,9 @@ export default class Podcast extends Component {
   };
 
   componentDidMount() {
-    // Check if podcast is download
-    RNFS.readDir("/storage/emulated/0/Music/Syntax")
-      .then(result => {
-        if (
-          result.find(
-            podcast =>
-              podcast.name ===
-              `Syntax${this.props.navigation.state.params.itemId}.mp3`
-          )
-        ) {
-          this.setState({ download: true });
-        } else {
-          this.setState({ download: false });
-        }
-      })
-      .catch(err => {
-        console.log(err.message, err.code);
-      });
+    this._retrieveData(this.props.navigation.state.params.itemId);
   }
+
   // Download Podcast
   downloadPodcast = (url, number) => {
     Animated.timing(
@@ -81,39 +60,104 @@ export default class Podcast extends Component {
         useNativeDriver: true
       }
     ).start();
-    this.setState({ isDownloading: true });
-    RNFetchBlob.config({
-      path: dirs.MusicDir + "/Syntax" + `/Syntax${number}.mp3`
-    })
-      .fetch("GET", url)
-      .progress((received, total) => {
+
+    RNFS.downloadFile({
+      fromUrl: url,
+      toFile: RNFS.DocumentDirectoryPath + `/Syntax${number}.mp3`,
+      connectionTimeout: 1000 * 10,
+      background: true,
+      discretionary: true,
+      progressDivider: 1,
+      begin: res => {
+        this.setState({ isDownloading: true });
+        console.log("Start Download");
+      },
+      progress: data => {
+        const percentage = ((100 * data.bytesWritten) / data.contentLength) | 0;
         this.setState({
-          downloadProgress: received / total
+          downloadProgress: percentage
         });
-      })
-      .then(res => {
+      }
+    })
+      .promise.then(res => {
+        console.log("Download finished.");
         this.setState({
           download: true,
           isDownloading: false,
           downloadProgress: 0
         });
+        this._downloadData();
+      })
+      .catch(err => {
+        console.log("error");
+        console.log(err);
       });
   };
 
   //Delete Podcast
   deletePodcast = () => {
     return RNFS.unlink(
-      `/storage/emulated/0/Music/Syntax/Syntax${
+      `${RNFS.DocumentDirectoryPath}/Syntax${
         this.props.navigation.state.params.itemId
       }.mp3`
     )
       .then(() => {
         console.log("FILE DELETED");
         this.setState({ download: false });
+        this._removeDownload();
       })
       .catch(err => {
         console.log(err.message);
       });
+  };
+
+  //Save to Async storage that the file is download
+  _downloadData = async () => {
+    const podcast = this.props.navigation.state.params.itemId;
+    const download = { playSeconds: 0, download: true };
+    try {
+      const value = await AsyncStorage.getItem(podcast.toString());
+      if (value !== null) {
+        obj = { ...JSON.parse(value), ...download };
+        AsyncStorage.setItem(podcast, JSON.stringify(obj));
+      } else {
+        AsyncStorage.setItem(podcast, JSON.stringify(download));
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+  };
+  //
+  _removeDownload = async () => {
+    const podcast = this.props.navigation.state.params.itemId;
+    try {
+      const value = await AsyncStorage.getItem(podcast.toString());
+      if (value !== null) {
+        const obj = JSON.parse(value);
+        AsyncStorage.setItem(
+          podcast,
+          JSON.stringify({ ...obj, download: false })
+        );
+      } else {
+        //AsyncStorage.setItem(podcast, JSON.stringify(download));
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+  };
+  //
+  _retrieveData = async podcast => {
+    await AsyncStorage.getItem(podcast.toString(), (err, result) => {
+      if (err) {
+      } else if (
+        JSON.parse(result) !== null &&
+        JSON.parse(result).download == true
+      ) {
+        this.setState({ download: true });
+      } else {
+        this.setState({ download: false });
+      }
+    });
   };
 
   //Check storage for restart podcast
@@ -122,7 +166,8 @@ export default class Podcast extends Component {
     let UID_object = {
       playSeconds,
       duration,
-      read: "fasle"
+      read: false,
+      download: true
     };
     try {
       await AsyncStorage.setItem(
@@ -137,27 +182,6 @@ export default class Podcast extends Component {
       );
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  // Granted Write access before saving podcast
-  grantedPodcast = async (url, number) => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: "SyntaxAndroid required Write permission",
-          message: "We required Write permission in order to save podcast"
-        }
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log("You've access for the WRITE_EXTERNAL_STORAGE");
-        this.downloadPodcast(url, number);
-      } else {
-        console.log("You don't have access for the WRITE_EXTERNAL_STORAGE");
-      }
-    } catch (err) {
-      alert(err);
     }
   };
 
@@ -186,7 +210,7 @@ export default class Podcast extends Component {
                         {this.state.isDownloading === false ? (
                           <TouchableOpacity
                             onPress={() =>
-                              this.grantedPodcast(
+                              this.downloadPodcast(
                                 data.podcast.url,
                                 this.props.navigation.state.params.itemId
                               )
@@ -226,6 +250,7 @@ export default class Podcast extends Component {
                     <Player
                       data={this.props.navigation.state.params.itemId}
                       save={this._storeData}
+                      dir={RNFS.DocumentDirectoryPath}
                     />
                   )}
                 </View>
